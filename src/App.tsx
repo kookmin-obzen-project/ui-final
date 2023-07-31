@@ -7,9 +7,9 @@ import Graph from "./components/Graph";
 function App() {
   return (
     <>
-      <Header />
-      <ChatList />
-      <Chat />
+      {/* <Header /> */}
+      {/* <ChatList /> */}
+      {/* <Chat /> */}
       <Graph />
     </>
   );
