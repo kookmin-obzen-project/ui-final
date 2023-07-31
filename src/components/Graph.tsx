@@ -1,7 +1,8 @@
-import React from "react";
+// import React from "react";
 import BarChart from "./BarChart";
 import { BarDatum } from "@nivo/bar";
 import DetailHeader from "./DetailHeader";
+// import ChartWrapper from "./ChartWrapper";
 
 export default function Graph() {
   return (
