@@ -10,7 +10,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.5.0
+      - run: npm i
       - name: Set up npm
         run: npm ci
-
+      
       - run: npm test
