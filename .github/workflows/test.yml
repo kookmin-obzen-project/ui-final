@@ -1,0 +1,16 @@
+name: Unit Tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.5.0
+      - name: Set up npm
+        run: npm ci
+
+      - run: npm test
