@@ -1,4 +1,8 @@
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+
 module.exports = {
+    preset: 'ts-jest',
+
     // Automatically clear mock calls, instances, contexts and results before every test
     clearMocks: true,
   
@@ -20,14 +24,28 @@ module.exports = {
     },
   
     // The test environment that will be used for testing
-    testEnvironment: 'jest-environment-node',
+    // testEnvironment: 'jest-environment-node',
+    testEnvironment: 'jsdom', 
   
+    transform: {
+      '^.+\\.{ts|tsx}?$': ['ts-jest', {
+        babel: true,
+        tsConfig: 'tsconfig.jest.json',
+        "useESM": true
+      }],
+   },
+
     // The glob patterns Jest uses to detect test files
     testMatch: [
       '<rootDir>/**/*.test.(js|jsx|ts|tsx)',
       '<rootDir>/(tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx))',
     ],
-  
+
+    setupFilesAfterEnv: ['<rootDir>/setupTest.js'],
+    
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    transformIgnorePatterns: ['<rootDir>/node_modules/'],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(\\/@nivo\\/colors))/"
+   ]
+   
   };
