@@ -24,4 +24,6 @@ yarn-error.log*
 
 
 .history
-.env
+**.env
+**.env_obzai
+**.env_db
