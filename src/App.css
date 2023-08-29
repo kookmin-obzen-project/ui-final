@@ -92,3 +92,25 @@
   width: 30px;
   content: url(https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/220px-PlusCM128.svg.png);
 }
+
+/* Chats.css */
+.chat-container {
+  display: flex;
+  height: 90vh;
+  background-color: white;
+}
+
+.chat-messages {
+  flex: 42;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+
+.message-box {
+  height: 580px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  position: relative;
+}
