@@ -14,6 +14,18 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
 
   const handleMessages = (newMessage: any) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
+    
+    //api 요청 보내기
+    /*
+    setIsLoading(true);
+    try {
+      const response = await chatService.sendMessage(newMessage.text); // chatService에 메시지 보내는 메서드가 있다고 가정
+      setMessages((prevMessages) => [...prevMessages, { sender: "chatbot", text: response }]);
+    } catch (error) {
+      console.error("API 요청 에러:", error);
+    }
+    setIsLoading(false);
+    */
   };
 
   const handleToggleGraph = () => {
@@ -27,8 +39,8 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
 
   return (
     <div className="flex-1 p-4 chat-container"> {/* App.css 스타일 */}
-      <div className="chat-messages"> {/* App.css 스타일 사용 */}
-        <div className="message-box"> {/* App.css 스타일 사용 */}
+      <div className="chat-messages"> {/* App.css 스타일 클래스 사용 */}
+        <div className="message-box"> {/* App.css 스타일 클래스 사용 */}
           {messages.map((message, index) => (
             <div
               key={index}
