@@ -1,5 +1,5 @@
 import React from "react";
-import { BiPlus, BiExpand, BiCollapse } from "react-icons/bi";
+import { BiPlus } from "react-icons/bi";
 import { TbLayoutSidebar, TbLayoutSidebarRight } from "react-icons/tb";
 interface AddChatButtonProps {
   onAddChat: () => void;
