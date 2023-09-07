@@ -3,39 +3,12 @@ sys.path.append("update-chat-server/server")
 
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
 from pydantic import *
-from typing import Annotated
-from db.db import *
-from db.model_chat  import Chat
-from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
+from db.model_chat  import *
 from fastapi import APIRouter
 
 
 app = FastAPI()
 router = APIRouter()
-# Chat = Chat()
-# Chat.metadata.create_all(bind=engine)
-
-# origins = [
-#      # "http://localhost:3000",
-#      "*",
-#  ]
-
-
-
-class ChatBase(BaseModel):
-    text: str
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async  def get_all_chats(db: db_dependency):
@@ -69,7 +42,10 @@ async def delete_chat(session_id: int, db: db_dependency):
 @router.post("/reflect", status_code=status.HTTP_200_OK)
 async def reflect_chat(chat: ChatBase, db: db_dependency):
     # 받은 채팅 정보를 그대로 반환
-    text =  {'answer':chat.text}
+    print("sessionID: " + chat.sessionID)
+    text =  {
+        'answer':chat.text,
+        }
     return text
 
 
