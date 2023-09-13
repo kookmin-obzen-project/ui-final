@@ -1,7 +1,7 @@
 import sys
 sys.path.append("update-chat-server/server/")
-
-from sqlalchemy import Boolean, Column, Integer, String
+from datetime import datetime
+from sqlalchemy import Boolean, Column, Integer, String, func, Text, DateTime
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
 from pydantic import *
 from typing import Annotated
@@ -10,19 +10,19 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 
-class Chat(Base):
-    __tablename__ = 'chats'
+class ChatRoom(Base):
+    __tablename__ = 'chatRoom'
 
     id = Column(Integer, primary_key=True, index=True)
-    talk = Column(String(50))
-    # username = Column(String(50), unique=True)
-    # question = Column(String(50))
-    # answer = Column(String(50))
+    user_session = Column(String, unique=True, server_default='')
+    created_at = Column(DateTime, default=func.now())
+    name = Column(String)
     
-class ChatBase(BaseModel):
-    talk: str
+class ChatRoomBase(BaseModel):
+    user_session: str
     # Test 를 위한 sessionID 추가
-    sessionID: str
+    created_at : datetime = datetime.now()
+    name: str
 
 
 def get_db():
@@ -33,14 +33,4 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
-
-
-
-# class Post(Base):
-#     __tablename__ = 'posts'
-#
-#     id = Column(Integer, primary_key=True, index=True)
-#     title = Column(String(50))
-#     content = Column(String(100))
-#     user_id = Column(Integer)
 
