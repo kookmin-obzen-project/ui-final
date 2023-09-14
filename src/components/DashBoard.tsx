@@ -6,10 +6,13 @@ import ShowChatListButton from "./chat_list/ShowChatListButton";
 
 export default function DashBoard({
   chatService,
+  userSessionID,
 }: {
   chatService: ChatService;
+  userSessionID: string | null;
 }) {
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const [chatSessionID, setChatSessionID] = useState<string | null>(null);
 
   const handleToggleChatList = () => {
     setIsChatListVisible((prevState) => {
@@ -19,14 +22,25 @@ export default function DashBoard({
     });
   };
 
+  // chatSessionID를 업데이트하는 함수
+  const updateChatSessionID = (selectedSessionID: string) => {
+    setChatSessionID(selectedSessionID);
+  };
+
   return (
     <div className="flex h-screen border-obzen-purple border-solid">
       <ShowChatListButton
         onShowChatList={handleToggleChatList}
         isChatListVisible={isChatListVisible}
       />
-      <ChatList isChatListVisible={isChatListVisible} onChatListToggle={handleToggleChatList} />
-      <Chats chatService={chatService} />
+      <ChatList
+        isChatListVisible={isChatListVisible}
+        onChatListToggle={handleToggleChatList}
+        userSessionID={userSessionID} 
+        chatSessionID={chatSessionID} // chatSessionID를 전달
+        onUpdateChatSessionID={updateChatSessionID} // chatSessionID를 업데이트하는 함수를 전달
+      />      
+      <Chats chatService={chatService} userSessionID={userSessionID} chatSessionID={chatSessionID}/>
     </div>
   );
 }

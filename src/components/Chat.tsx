@@ -2,15 +2,43 @@ import React, { useState } from "react";
 import Graph from "./graph/Graph";
 import ChatService from "../service/chat";
 import NewChatForm from "./NewChatForm";
-import { v4 as uuidv4 } from 'uuid';
-import Cookies from 'js-cookie';
 
-export default function Chats({ chatService }: { chatService: ChatService }) {
+export default function Chats({
+  chatService,
+  userSessionID, 
+  chatSessionID,
+}: {
+  chatService: ChatService;
+  userSessionID: string | null;
+  chatSessionID: string | null; 
+}) {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     []
   );
   const [showGraph, setShowGraph] = useState(false);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
+
+  // const loadMessages = async () => {
+  //   if (userSessionID && chatSessionID) {
+  //     const messages = await chatService.getChatData(userSessionID, chatSessionID);
+  //     setMessages(messages);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   // userSessionID를 이용하여 해당 사용자의 채팅 데이터를 불러오는 로직을 구현하세요.
+  //   if (userSessionID) {
+  //     // userSessionID를 사용하여 chatService에서 채팅 데이터를 불러옵니다.
+  //     chatService.getChatData(userSessionID).then((data) => {
+  //       // 불러온 데이터를 messages state에 설정합니다.
+  //       setMessages(data);
+  //     });
+  //   }
+  // }, [chatService, userSessionID]);
+
+  if (userSessionID === null || chatSessionID === null) {
+    return <div className="text-red-500">유효한 세션 ID가 필요합니다.</div>;
+  }  
 
   const handleMessages = async (newMessage: any) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -18,11 +46,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
     if (newMessage.sender === "user") {
       // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
       try {
-        // SessionID 생성 
-        const sessionID = Cookies.get('sessionID') || uuidv4();
-        Cookies.set('sessionID', sessionID, { expires: 1 });
-        
-        const response = await chatService.sendMessage(sessionID, newMessage.text);
+        const response = await chatService.sendMessage(userSessionID, newMessage.text);
         
         const chatbotResponse = {
           sender: "chatbot",
