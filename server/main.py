@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from routes import chats, chatAnswer, chatQuestion, chatRoom
+from routes import chats, chatAnswer, chatQuestion, chatRoom, session
 from db.model_chatRoom import *
 from db.model_chatQuestion import *
 from db.model_chatAnswer import *
@@ -45,4 +45,4 @@ app.include_router(chats.router, prefix="/chats")
 app.include_router(chatRoom.router, prefix="/chatRoom")
 app.include_router(chatAnswer.router, prefix="/chatAnswer")
 app.include_router(chatQuestion.router, prefix="/chatQuestion")
-#pp.include_router(router=ctrl_router)
+app.include_router(chatQuestion.router, prefix="/session")

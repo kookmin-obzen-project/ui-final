@@ -1,7 +1,6 @@
 import sys
 sys.path.append("update-chat-server/server/")
-from datetime import datetime
-from sqlalchemy import Boolean, Column, Integer, String, func, Text, DateTime
+from sqlalchemy import *
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
 from pydantic import *
 from typing import Annotated
@@ -10,21 +9,16 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 
-class ChatRoom(Base):
-    __tablename__ = 'chatRoom'
+class Session(Base):
+    __tablename__ = 'session'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_session = Column(String, unique=True)
-    chat_session = Column(String, unique=True, server_default='')
-    name = Column(String)
     created_at = Column(DateTime, default=func.now())
-    
-    
-class ChatRoomBase(BaseModel):
-    user_session : str
-    chat_session : str
-    name: str
+    user_session = Column(String, unique=True, index=True)
+
+class SessionBase(BaseModel):
     created_at : datetime = datetime.now()
+    user_session : str
 
 def get_db():
     db = SessionLocal()

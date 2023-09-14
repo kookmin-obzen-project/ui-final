@@ -19,12 +19,32 @@ async  def get_all_chatQuestion(db: db_dependency):
     chatQuestion = db.query(ChatQuestion).all()
     return chatQuestion
 
-
 # chatQuestion sessionID 로 필터링 후 해당 채팅방 전체 답변 받아오기
-@router.get("/{session_id}", status_code=status.HTTP_200_OK)
-async def read_chatQuestion(session_id: str, db: db_dependency):
-    chatQuestion = db.query(ChatQuestion).filter(ChatQuestion.chatRoom_session == session_id).all()
+@router.get("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
+async def get_user_chatQuestion(user_session: str, chat_session: str, db: db_dependency):
+    chatQuestion = db.query(ChatQuestion).filter(
+        and_(
+            ChatQuestion.user_session == user_session,
+            ChatQuestion.chat_session == chat_session)
+        ).all()
     if len(chatQuestion) == 0:
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None: 
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Question does not exist')
+    return chatQuestion
+
+# chatQuestion sessionID 로 필터링 후 해당 채팅방 특정 답변 받아오기
+@router.get("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
+async def get_user_chatQuestion(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+    chatQuestion = db.query(ChatQuestion).filter(
+        and_(
+            ChatQuestion.user_session == user_session,
+            ChatQuestion.chat_session == chat_session,
+            ChatQuestion.id == chat_id)
+        ).first()
+    if chatQuestion is None:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
         if chatRoom is None: 
             raise HTTPException(status_code=404, detail='chatRoom not found')
@@ -40,10 +60,14 @@ async def create_chat(chatQuestion: ChatQuestionBase, db: db_dependency):
     db.commit()
 
 # chatRoom sessionID 로 필터링 후 해당 채팅방 전체 질문 삭제하기
-@router.delete("/{session_id}", status_code=status.HTTP_200_OK)
-async def delete_chat(session_id: str, db: db_dependency):
-    deleted = db.query(ChatQuestion).filter(ChatQuestion.chatRoom_session == session_id).first()
-    if deleted is None:
+@router.delete("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
+async def delete_chat(user_session: str, chat_session: str, db: db_dependency):
+    deleted = db.query(ChatQuestion).filter(
+        and_(
+            ChatQuestion.user_session == user_session,
+            ChatQuestion.chat_session == chat_session)
+        ).all()
+    if len(deleted) == 0:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
         if chatRoom is None:
             raise HTTPException(status_code=404, detail='chatRoom not found')
@@ -51,18 +75,22 @@ async def delete_chat(session_id: str, db: db_dependency):
             raise HTTPException(status_code=404, detail='Question does not exist')
     db.delete(deleted)
     db.commit()
-    
+
 # chatRoom sessionID, index 로 필터링 후 해당 질문 삭제하기
-@router.delete("/{session_id}/{chat_id}", status_code=status.HTTP_200_OK)
-async def delete_chat(session_id: str, chat_id: int, db: db_dependency):
-    deleted = db.query(ChatQuestion).filter(and_(ChatQuestion.chatRoom_session == session_id, ChatQuestion.id == chat_id)).first()
+@router.delete("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
+async def delete_chat(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+    deleted = db.query(ChatQuestion).filter(
+        and_(
+            ChatQuestion.user_session == user_session,
+            ChatQuestion.chat_session == chat_session,
+            ChatQuestion.id == chat_id)
+        ).first()
     if deleted is None:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
         if chatRoom is None:
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
             raise HTTPException(status_code=404, detail= str(chat_id)+ ' Question does not exist')
-        
     db.delete(deleted)
     db.commit()
 

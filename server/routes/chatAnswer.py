@@ -19,12 +19,32 @@ async  def get_all_chatAnswer(db: db_dependency):
     chatAnswer = db.query(ChatAnswer).all()
     return chatAnswer
 
-
-# chatRoom sessionID 로 필터링 후 해당 채팅방 전체 답변 받아오기
-@router.get("/{session_id}", status_code=status.HTTP_200_OK)
-async def read_chatAnswer(session_id: str, db: db_dependency):
-    chatAnswer = db.query(ChatAnswer).filter(ChatAnswer.chatRoom_session == session_id).all()
+# chatAnswer sessionID 로 필터링 후 해당 채팅방 전체 답변 받아오기
+@router.get("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
+async def get_user_chatAnswer(user_session: str, chat_session: str, db: db_dependency):
+    chatAnswer = db.query(ChatAnswer).filter(
+        and_(
+            ChatAnswer.user_session == user_session,
+            ChatAnswer.chat_session == chat_session)
+        ).all()
     if len(chatAnswer) == 0:
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None: 
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Answer does not exist')
+    return chatAnswer
+
+# chatAnswer sessionID 로 필터링 후 해당 채팅방 특정 답변 받아오기
+@router.get("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
+async def get_user_chatAnswer(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+    chatAnswer = db.query(ChatAnswer).filter(
+        and_(
+            ChatAnswer.user_session == user_session,
+            ChatAnswer.chat_session == chat_session,
+            ChatAnswer.id == chat_id)
+        ).first()
+    if chatAnswer is None:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
         if chatRoom is None: 
             raise HTTPException(status_code=404, detail='chatRoom not found')
@@ -39,23 +59,32 @@ async def create_chat(chatAnswer: ChatAnswerBase, db: db_dependency):
     db.add(db_chatAnswer)
     db.commit()
 
-# chatRoom sessionID 로 필터링 후 해당 채팅방 전체 답변 삭제하기
-@router.delete("/{session_id}", status_code=status.HTTP_200_OK)
-async def delete_chat(session_id: str, db: db_dependency):
-    deleted = db.query(ChatAnswer).filter(ChatAnswer.chatRoom_session == session_id).first()
-    if deleted is None:
+# chatRoom sessionID 로 필터링 후 해당 채팅방 전체 질문 삭제하기
+@router.delete("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
+async def delete_chat(user_session: str, chat_session: str, db: db_dependency):
+    deleted = db.query(ChatAnswer).filter(
+        and_(
+            ChatAnswer.user_session == user_session,
+            ChatAnswer.chat_session == chat_session)
+        ).all()
+    if len(deleted) == 0:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
-        if chatRoom is None: 
+        if chatRoom is None:
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
             raise HTTPException(status_code=404, detail='Answer does not exist')
     db.delete(deleted)
     db.commit()
-    
-# chatRoom sessionID, index 로 필터링 후 해당 답변 삭제하기
-@router.delete("/{session_id}/{chat_id}", status_code=status.HTTP_200_OK)
-async def delete_chat(session_id: str, chat_id: int, db: db_dependency):
-    deleted = db.query(ChatAnswer).filter(and_(ChatAnswer.chatRoom_session == session_id, ChatAnswer.id == chat_id)).first()
+
+# chatRoom sessionID, index 로 필터링 후 해당 질문 삭제하기
+@router.delete("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
+async def delete_chat(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+    deleted = db.query(ChatAnswer).filter(
+        and_(
+            ChatAnswer.user_session == user_session,
+            ChatAnswer.chat_session == chat_session,
+            ChatAnswer.id == chat_id)
+        ).first()
     if deleted is None:
         chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
         if chatRoom is None:
@@ -64,4 +93,3 @@ async def delete_chat(session_id: str, chat_id: int, db: db_dependency):
             raise HTTPException(status_code=404, detail= str(chat_id)+ ' Answer does not exist')
     db.delete(deleted)
     db.commit()
-

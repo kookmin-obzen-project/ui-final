@@ -16,16 +16,14 @@ class ChatQuestion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text)
-    chatRoom_session = Column(String)
+    chat_session = Column(String)
+    user_session = Column(String, unique=True)
     created_at = Column(DateTime, default=func.now())
-    # username = Column(String(50), unique=True)
-    # question = Column(String(50))
-    # answer = Column(String(50))
     
 class ChatQuestionBase(BaseModel):
     text: str
-    # Test 를 위한 sessionID 추가
-    chatRoom_session: str
+    chat_session: str
+    user_session : str
     created_at : datetime = datetime.now()
 
 
@@ -37,14 +35,4 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
-
-
-
-# class Post(Base):
-#     __tablename__ = 'posts'
-#
-#     id = Column(Integer, primary_key=True, index=True)
-#     title = Column(String(50))
-#     content = Column(String(100))
-#     user_id = Column(Integer)
 
