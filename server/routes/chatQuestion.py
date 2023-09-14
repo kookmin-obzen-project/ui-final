@@ -25,7 +25,11 @@ async  def get_all_chatQuestion(db: db_dependency):
 async def read_chatQuestion(session_id: str, db: db_dependency):
     chatQuestion = db.query(ChatQuestion).filter(ChatQuestion.chatRoom_session == session_id).all()
     if len(chatQuestion) == 0:
-        raise HTTPException(status_code=404, detail='chatRoom`Question not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None: 
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Question does not exist')
     return chatQuestion
 
 # chatQuestion 생성하기
@@ -40,7 +44,11 @@ async def create_chat(chatQuestion: ChatQuestionBase, db: db_dependency):
 async def delete_chat(session_id: str, db: db_dependency):
     deleted = db.query(ChatQuestion).filter(ChatQuestion.chatRoom_session == session_id).first()
     if deleted is None:
-        raise HTTPException(status_code=404, detail='chat not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None:
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Question does not exist')
     db.delete(deleted)
     db.commit()
     
@@ -49,7 +57,12 @@ async def delete_chat(session_id: str, db: db_dependency):
 async def delete_chat(session_id: str, chat_id: int, db: db_dependency):
     deleted = db.query(ChatQuestion).filter(and_(ChatQuestion.chatRoom_session == session_id, ChatQuestion.id == chat_id)).first()
     if deleted is None:
-        raise HTTPException(status_code=404, detail='Quesion not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None:
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail= str(chat_id)+ ' Question does not exist')
+        
     db.delete(deleted)
     db.commit()
 

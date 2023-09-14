@@ -4,25 +4,13 @@ sys.path.append("update-chat-server/server")
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
 from pydantic import *
 from db.model_chat  import *
-from db.model_chatRoom  import *
-from db.model_chatAnswer  import *
-from db.model_chatQuestion  import *
+
 from fastapi import APIRouter, Request
 
 
 app = FastAPI()
 router = APIRouter()
 
-@router.get("/chatRoom", status_code=status.HTTP_200_OK)
-async  def get_all_chats(db: db_dependency):
-    chats = db.query(ChatRoom).all()
-    return chats
-
-@router.post("/chatRoom", status_code=status.HTTP_201_CREATED)
-async def create_chat(chatRoom: ChatRoomBase, db: db_dependency):
-    db_chatRoom = ChatRoom(**chatRoom.dict())
-    db.add(db_chatRoom)
-    db.commit()
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async  def get_all_chats(db: db_dependency):

@@ -25,7 +25,11 @@ async  def get_all_chatAnswer(db: db_dependency):
 async def read_chatAnswer(session_id: str, db: db_dependency):
     chatAnswer = db.query(ChatAnswer).filter(ChatAnswer.chatRoom_session == session_id).all()
     if len(chatAnswer) == 0:
-        raise HTTPException(status_code=404, detail='chatRoom`s Answer not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None: 
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Answer does not exist')
     return chatAnswer
 
 # chatAnswer 생성하기
@@ -40,7 +44,11 @@ async def create_chat(chatAnswer: ChatAnswerBase, db: db_dependency):
 async def delete_chat(session_id: str, db: db_dependency):
     deleted = db.query(ChatAnswer).filter(ChatAnswer.chatRoom_session == session_id).first()
     if deleted is None:
-        raise HTTPException(status_code=404, detail='chat not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None: 
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail='Answer does not exist')
     db.delete(deleted)
     db.commit()
     
@@ -49,7 +57,11 @@ async def delete_chat(session_id: str, db: db_dependency):
 async def delete_chat(session_id: str, chat_id: int, db: db_dependency):
     deleted = db.query(ChatAnswer).filter(and_(ChatAnswer.chatRoom_session == session_id, ChatAnswer.id == chat_id)).first()
     if deleted is None:
-        raise HTTPException(status_code=404, detail='chat not found')
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        if chatRoom is None:
+            raise HTTPException(status_code=404, detail='chatRoom not found')
+        else:
+            raise HTTPException(status_code=404, detail= str(chat_id)+ ' Answer does not exist')
     db.delete(deleted)
     db.commit()
 
