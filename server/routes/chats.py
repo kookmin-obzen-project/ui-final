@@ -1,11 +1,10 @@
 import sys
 sys.path.append("update-chat-server/server")
 
-from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
+from fastapi import FastAPI, HTTPException, Depends, status, APIRouter, Request
 from pydantic import *
 from db.model_chat  import *
 
-from fastapi import APIRouter, Request
 
 
 app = FastAPI()
@@ -44,7 +43,9 @@ async def delete_chat(session_id: int, db: db_dependency):
 @router.post("/reflect", status_code=status.HTTP_200_OK)
 async def reflect_chat(chat: ChatBase, db: db_dependency):
     # 받은 채팅 정보를 그대로 반환
+
     print("chat - sessionID: ",chat.sessionID)
+
     text =  {
         'answer':chat.text,
         }
