@@ -14,7 +14,7 @@ class ChatRoom(Base):
     __tablename__ = 'chatRoom'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_session = Column(String, unique=True)
+    user_session = Column(String, unique=True) 
     chat_session = Column(String, unique=True, server_default='')
     name = Column(String)
     created_at = Column(DateTime, default=func.now())
