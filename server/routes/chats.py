@@ -50,6 +50,10 @@ async def reflect_chat(chat: ChatBase, db: db_dependency):
         'answer':chat.text,
         }
     # 같은 채팅창일 경우 sessionID 가 같게 넘어옴
+    db_chat = Chat(**chat.dict())
+    db.add(db_chat)
+    db.commit()
+
     return text
 
 # Cookie 를 적용했지만 작동 X -> local환경 등 코드 자체는 맞음
