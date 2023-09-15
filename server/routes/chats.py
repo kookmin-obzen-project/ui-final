@@ -44,12 +44,12 @@ async def delete_chat(session_id: int, db: db_dependency):
 @router.post("/reflect", status_code=status.HTTP_200_OK)
 async def reflect_chat(chat: ChatBase, db: db_dependency):
     # 받은 채팅 정보를 그대로 반환
-    print("chat - sessionID: " + chat.sessionID)
-    talk =  {
-        'answer':chat.talk,
+    print("chat - sessionID: ",chat.sessionID)
+    text =  {
+        'answer':chat.text,
         }
     # 같은 채팅창일 경우 sessionID 가 같게 넘어옴
-    return talk
+    return text
 
 # Cookie 를 적용했지만 작동 X -> local환경 등 코드 자체는 맞음
 # @router.post("/reflect", status_code=status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 import sys
 sys.path.append("update-chat-server/server/")
 
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, Text
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
 from pydantic import *
 from typing import Annotated
@@ -14,13 +14,14 @@ class Chat(Base):
     __tablename__ = 'chats'
 
     id = Column(Integer, primary_key=True, index=True)
-    talk = Column(String(50))
+    text = Column(String(50))
+    sessionID = Column(Text)
     # username = Column(String(50), unique=True)
     # question = Column(String(50))
     # answer = Column(String(50))
     
 class ChatBase(BaseModel):
-    talk: str
+    text: str
     # Test 를 위한 sessionID 추가
     sessionID: str
 
