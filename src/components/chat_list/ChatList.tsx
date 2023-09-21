@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ChatListItem from "./ChatListItem";
 import AddChatButton from "./AddChatButton";
+import "../../App.css";
 
 export default function ChatList({
   isChatListVisible, // isChatListVisible를 props로 받음
