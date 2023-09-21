@@ -60,13 +60,13 @@ export default function NewChatForm({
       />
       <button
         onClick={handleSendMessage}
-        className={`p-5 rounded-lg bg-white text-gray-400 border cursor-pointer border-border-gray-400 group hover:borde-violet-400 focus:border-gray-300 ${
+        className={`p-5 rounded-lg bg-white text-gray-400 border cursor-pointer border-border-gray-400 group hover:border-black focus:border-gray-300 ${
           isButtonHovered ? "border-2" : "border-1"
         }`}
         onMouseEnter={() => setIsButtonHovered(true)}
         onMouseLeave={() => setIsButtonHovered(false)}
       >
-        <FaPaperPlane className={`text-gray-500 group-hover:text-violet-400`} />
+        <FaPaperPlane className={`text-gray-500 group-hover:text-black`} />
       </button>
     </div>
   );
