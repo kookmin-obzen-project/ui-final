@@ -9,7 +9,6 @@ import uuid
 app = FastAPI()
 router = APIRouter()
 
-### 여기서부터 고쳐봅시다 session 파트
 @router.get("/", status_code=status.HTTP_201_CREATED)
 async def create_session( db: db_dependency):
     session_expiration_time = 3600 # 초 단위, 3600 = 1시간, record expiration time = cookie expiration time
@@ -25,10 +24,3 @@ async def create_session( db: db_dependency):
     db.commit()
     
     return response
-#     def create_session(user_id: int, db: Session = Depends(SessionLocal)):
-#     session_id = str(uuid4())
-#     db_session = SessionModel(session_id=session_id, user_id=user_id)
-#     db.add(db_session)
-#     db.commit()
-#     db.refresh(db_session)
-#     return db_session
