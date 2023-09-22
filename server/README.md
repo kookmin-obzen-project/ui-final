@@ -23,3 +23,9 @@
 # DB 연결 
 1. db - .env.db 에서 본인 db_url 입력 
 ex. db_url='mysql+pymysql://[user_name]:[user_password]@[user_localhost]/[DB_name]'
+
+# api 명세서
+1. 서버를 실행합니다. 
+2. http://[host]:[port]/docs 에 접속합니다. 
+ex. "uvicorn main:app --host=127.0.0.1 --port=8080 --reload" 로 서버를 실행할 경우
+    http://127.0.0.1:8080/docs 에 접속합니다.
