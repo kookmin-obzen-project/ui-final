@@ -15,10 +15,11 @@ class Session(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=func.now())
     expired_at = Column(DateTime, default= None)
-    user_session = Column(String, unique=True, index=True)
+    user_session = Column(String, unique=True)
 
 class SessionBase(BaseModel):
     created_at : datetime = datetime.now()
+    expired_at : datetime = None
     user_session : str
 
 def get_db():

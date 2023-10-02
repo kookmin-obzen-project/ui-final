@@ -15,8 +15,8 @@ class ChatQuestion(Base):
     __tablename__ = 'chatQuestion'
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(Text)
-    chat_session = Column(String)
+    text = Column(Text, default=None)
+    chat_session = Column(String, unique=True)
     user_session = Column(String, unique=True)
     created_at = Column(DateTime, default=func.now())
     

@@ -15,8 +15,8 @@ class ChatRoom(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_session = Column(String, unique=True) 
-    chat_session = Column(String, unique=True, server_default='')
-    name = Column(String)
+    chat_session = Column(String, unique=True)
+    name = Column(String, default=None)
     created_at = Column(DateTime, default=func.now())
     
     
