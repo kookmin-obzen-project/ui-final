@@ -6,14 +6,17 @@ import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie';
 
 export default function Chats({ chatService }: { chatService: ChatService }) {
-  const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [showGraph, setShowGraph] = useState(false);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
+  const [initialExplanationShown, setInitialExplanationShown] = useState(true);
 
   const handleMessages = async (newMessage: any) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    if (newMessage.sender === "user" && initialExplanationShown) {
+      setInitialExplanationShown(false);
+    }
 
     if (newMessage.sender === "user") {
       // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
@@ -48,12 +51,8 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
 
   return (
     <div className="flex-1 p-4">
-      <div
-        style={{ display: "flex", height: "90vh", backgroundColor: "white" }}
-      >
-        <div
-          style={{ flex: 42, padding: "20px", borderRight: "1px solid #ccc" }}
-        >
+      <div style={{ display: "flex", height: "90vh", backgroundColor: "white", justifyContent: "center" }}>
+        <div style={{ flex: 42, padding: "20px", borderRight: "1px solid #ccc", width: "80%" }}>
           <div
             style={{
               height: "580px",
@@ -64,6 +63,19 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
               position: "relative",
             }}
           >
+            {initialExplanationShown && (
+              <div className="mb-4" style={{ textAlign: 'center', marginTop: '480px' }}>
+                <div className="bg-gray-100 text-black p-4 rounded-lg" style={{ width: '40%', float: 'left', marginLeft: '8%'}}>
+                  You can change the chat name.
+                </div>
+                <div className="mb-4">
+                  <div className="bg-gray-100 text-black p-4 rounded-lg" style={{ width: '40%', float: 'right', marginRight: '8%'}}>
+                    when you have a question, ask me.
+                  </div>
+                </div>
+              </div>
+            )}
+  
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -72,28 +84,20 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
                 } mb-10`}
               >
                 {message.sender === "chatbot" && (
-                  <div>
-                    <div className="bg-gray-200 text-black p-4 rounded-lg inline-flex items-center justify-end relative">
-                      {message.text}
-                    </div>
+                  <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
+                    {message.text}
                     <div className="mt-2 flex items-center">
-                      <span
-                        onClick={handleToggleGraph}
-                        className="cursor-pointer underline text-sm mr-2"
-                      >
+                      <span onClick={handleToggleGraph} className="cursor-pointer underline text-sm mr-2">
                         상세보기
                       </span>
-                      <span
-                        //onClick={handleSendMessage}
-                        className="cursor-pointer underline text-sm"
-                      >
+                      <span className="cursor-pointer underline text-sm">
                         선택하기
                       </span>
                     </div>
                   </div>
                 )}
                 {message.sender === "user" && (
-                  <div className="bg-gray-300 text-black p-4 rounded-lg inline-block text-right">
+                  <div className="bg-pastel-light-blue text-black p-4 rounded-lg inline-block text-right">
                     {message.text}
                   </div>
                 )}
@@ -101,13 +105,11 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
             ))}
 
           </div>
-          <NewChatForm
-            onQuestionClick={handleMessages}
-            chatService={chatService}
-          />
+          <NewChatForm onQuestionClick={handleMessages} chatService={chatService} />
         </div>
         {showGraph && <Graph isGraphLoading={isGraphLoading} />}
       </div>
     </div>
   );
+  
 }

@@ -92,3 +92,15 @@
   width: 30px;
   content: url(https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/220px-PlusCM128.svg.png);
 }
+
+.bg-pastel-blue {
+  background-color: #a7c0ea;
+}
+
+.bg-pastel-light-blue {
+  background-color: #cad9f092;
+}
+
+.bg-pastel-light-blue2 {
+  background-color: #a7c0ea;
+}
