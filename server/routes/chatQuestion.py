@@ -1,7 +1,7 @@
 import sys
 sys.path.append("update-chat-server/server")
 
-from fastapi import FastAPI, HTTPException, Depends, status, APIRouter
+from fastapi import FastAPI, HTTPException, Depends, status, APIRouter, Request, Response
 from pydantic import *
 from db.model_chat  import *
 from db.model_chatRoom  import *
@@ -20,15 +20,16 @@ async  def get_all_chatQuestion(db: db_dependency):
     return chatQuestion
 
 # chatQuestion sessionID 로 필터링 후 해당 채팅방 전체 답변 받아오기
-@router.get("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
-async def get_user_chatQuestion(user_session: str, chat_session: str, db: db_dependency):
+@router.get("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
+async def get_Room_chatQuestion(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
     chatQuestion = db.query(ChatQuestion).filter(
         and_(
-            ChatQuestion.user_session == user_session,
-            ChatQuestion.chat_session == chat_session)
+            ChatQuestion.session_ID == session_ID,
+            ChatQuestion.chatRoom_ID == chatRoom_ID)
         ).all()
     if len(chatQuestion) == 0:
-        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_id).first()
         if chatRoom is None: 
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
@@ -36,16 +37,17 @@ async def get_user_chatQuestion(user_session: str, chat_session: str, db: db_dep
     return chatQuestion
 
 # chatQuestion sessionID 로 필터링 후 해당 채팅방 특정 답변 받아오기
-@router.get("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
-async def get_user_chatQuestion(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+@router.get("/{chatRoom_ID}/{chat_id}", status_code=status.HTTP_200_OK)
+async def get_Room_one_chatQuestion(chatRoom_ID: str, chat_id: int, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
     chatQuestion = db.query(ChatQuestion).filter(
         and_(
-            ChatQuestion.user_session == user_session,
-            ChatQuestion.chat_session == chat_session,
+            ChatQuestion.session_ID == session_ID,
+            ChatQuestion.chatRoom_ID == chatRoom_ID,
             ChatQuestion.id == chat_id)
         ).first()
     if chatQuestion is None:
-        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_id).first()
         if chatRoom is None: 
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
@@ -54,21 +56,33 @@ async def get_user_chatQuestion(user_session: str, chat_session: str, chat_id: i
 
 # chatQuestion 생성하기
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_chat(chatQuestion: ChatQuestionBase, db: db_dependency):
+async def create_chatQuestion(chatQuestion: ChatQuestionBase, db: db_dependency):
     db_chatQuestion = ChatQuestion(**chatQuestion.dict())
     db.add(db_chatQuestion)
     db.commit()
+    
+# # chatQuestion생성하기 -> 쿼리스트링으로 chatRoom_ID 만 받아 생성하는 방식
+@router.post("/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
+async def create_chatQuestion_ver2(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
+    new_chatQuestion = ChatQuestion(
+        session_ID = session_ID,
+        chatRoom_ID = chatRoom_ID,
+    )
+    db.add(new_chatQuestion)
+    db.commit()
 
 # chatRoom sessionID 로 필터링 후 해당 채팅방 전체 질문 삭제하기
-@router.delete("/{user_session}/{chat_session}", status_code=status.HTTP_200_OK)
-async def delete_chat(user_session: str, chat_session: str, db: db_dependency):
+@router.delete("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
+async def delete_Room_chatQuestion(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
     deleted = db.query(ChatQuestion).filter(
         and_(
-            ChatQuestion.user_session == user_session,
-            ChatQuestion.chat_session == chat_session)
+            ChatQuestion.session_ID == session_ID,
+            ChatQuestion.chatRoom_ID == chatRoom_ID)
         ).all()
     if len(deleted) == 0:
-        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_id).first()
         if chatRoom is None:
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
@@ -77,16 +91,17 @@ async def delete_chat(user_session: str, chat_session: str, db: db_dependency):
     db.commit()
 
 # chatRoom sessionID, index 로 필터링 후 해당 질문 삭제하기
-@router.delete("/{user_session}/{chat_session}/{chat_id}", status_code=status.HTTP_200_OK)
-async def delete_chat(user_session: str, chat_session: str, chat_id: int, db: db_dependency):
+@router.delete("/{chatRoom_ID}/{chat_id}", status_code=status.HTTP_200_OK)
+async def delete_Room_one_chatQuestion(chatRoom_ID: str, chat_id: int, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
     deleted = db.query(ChatQuestion).filter(
         and_(
-            ChatQuestion.user_session == user_session,
-            ChatQuestion.chat_session == chat_session,
+            ChatQuestion.session_ID == session_ID,
+            ChatQuestion.chatRoom_ID == chatRoom_ID,
             ChatQuestion.id == chat_id)
         ).first()
     if deleted is None:
-        chatRoom = db.query(ChatRoom).filter(ChatRoom.user_session == session_id).first()
+        chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_id).first()
         if chatRoom is None:
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:

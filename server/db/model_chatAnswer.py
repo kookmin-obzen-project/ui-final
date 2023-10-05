@@ -21,14 +21,14 @@ class ChatAnswer(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text, default=None)
-    chat_session = Column(String, unique=True)
-    user_session = Column(String, unique=True)
+    chatRoom_ID = Column(String, unique=True)
+    session_ID = Column(String, unique=True)
     created_at = Column(DateTime, default=func.now())
     
 class ChatAnswerBase(BaseModel):
     text: str
-    chat_session: str
-    user_session : str
+    chatRoom_ID: str
+    session_ID : str
     created_at : datetime = datetime.now()
 
 def get_db():
