@@ -17,7 +17,7 @@ class ChatQuestion(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text, default=None)
     chatRoom_ID = Column(String, unique=True)
-    session_ID = Column(String, unique=True)
+    session_ID = Column(String)
     created_at = Column(DateTime, default=func.now())
     
 class ChatQuestionBase(BaseModel):

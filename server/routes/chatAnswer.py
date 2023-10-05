@@ -8,9 +8,7 @@ from db.model_chatRoom  import *
 from db.model_chatAnswer  import *
 from db.model_chatQuestion  import *
 from fastapi import APIRouter, Request
-
-# request:Request, response:Response,
-# session_ID = await get_session(request, response, db)
+from routes.JSON_format import *
 
 app = FastAPI()
 router = APIRouter()
@@ -19,7 +17,7 @@ router = APIRouter()
 @router.get("/", status_code=status.HTTP_200_OK)
 async  def get_all_chatAnswer(db: db_dependency):
     chatAnswer = db.query(ChatAnswer).all()
-    return chatAnswer
+    return JSON_format("Success, Get All chatAnswer", chatAnswer)
 
 # chatAnswer sessionID 로 필터링 후 해당 채팅방 전체 답변 받아오기
 @router.get("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
@@ -36,7 +34,7 @@ async def get_Room_chatAnswer(chatRoom_ID: str, request:Request, response:Respon
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
             raise HTTPException(status_code=404, detail='Answer does not exist')
-    return chatAnswer
+    return JSON_format(f"Success, Get {chatRoom_ID} chatAnswer", chatAnswer)
 
 # chatAnswer sessionID 로 필터링 후 해당 채팅방 특정 답변 받아오기
 @router.get("/{chatRoom_ID}/{chat_id}", status_code=status.HTTP_200_OK)
@@ -54,14 +52,15 @@ async def get_Room_one_chatAnswer(chatRoom_ID: str, chat_id: int, request:Reques
             raise HTTPException(status_code=404, detail='chatRoom not found')
         else:
             raise HTTPException(status_code=404, detail='Answer does not exist')
-    return chatAnswer
+    return JSON_format(f"Success, Get {chatRoom_ID}-{chat_id} chatAnswer", chatAnswer)
 
 # chatAnswer 생성하기
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/chatAnswer_Base", status_code=status.HTTP_201_CREATED)
 async def create_chatAnswer(chatAnswer: ChatAnswerBase, db: db_dependency):
-    db_chatAnswer = ChatAnswer(**chatAnswer.dict())
-    db.add(db_chatAnswer)
+    new_chatAnswer = ChatAnswer(**chatAnswer.dict())
+    db.add(new_chatAnswer)
     db.commit()
+    return JSON_format("Success, Create chatAnswer", new_chatAnswer)
 
 # # chatAnswer생성하기 -> 쿼리스트링으로 chatRoom_ID 만 받아 생성하는 방식
 @router.post("/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
@@ -73,10 +72,11 @@ async def create_chatAnswer_ver2(chatRoom_ID: str, request:Request, response:Res
     )
     db.add(new_chatAnswer)
     db.commit()
+    return JSON_format(f"Success, Create chatAnswer", new_chatAnswer)
 
 
 # chatRoom sessionID 로 필터링 후 해당 채팅방 전체 질문 삭제하기
-@router.delete("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
+@router.delete("/{chatRoom_ID}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_Room_chatAnswer(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
     session_ID = await get_session(request, response, db)
     deleted = db.query(ChatAnswer).filter(
@@ -92,9 +92,10 @@ async def delete_Room_chatAnswer(chatRoom_ID: str, request:Request, response:Res
             raise HTTPException(status_code=404, detail='Answer does not exist')
     db.delete(deleted)
     db.commit()
+    return JSON_format(f"Success, Delete {chatRoom_ID} chatAnswer", chatAnswer)
 
 # chatRoom sessionID, index 로 필터링 후 해당 질문 삭제하기
-@router.delete("/{chatRoom_ID}/{chat_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{chatRoom_ID}/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_Room_one_chatAnswer(chatRoom_ID: str, chat_id: int, request:Request, response:Response, db: db_dependency):
     session_ID = await get_session(request, response, db)
     deleted = db.query(ChatAnswer).filter(
@@ -111,3 +112,4 @@ async def delete_Room_one_chatAnswer(chatRoom_ID: str, chat_id: int, request:Req
             raise HTTPException(status_code=404, detail= str(chat_id)+ ' Answer does not exist')
     db.delete(deleted)
     db.commit()
+    return JSON_format(f"Success, Delete {chatRoom_ID}-{chat_id} chatAnswer", deleted)

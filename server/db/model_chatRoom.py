@@ -14,7 +14,7 @@ class ChatRoom(Base):
     __tablename__ = 'chatRoom'
 
     id = Column(Integer, primary_key=True, index=True)
-    session_ID = Column(String, unique=True) 
+    session_ID = Column(String) 
     chatRoom_ID = Column(String, unique=True)
     name = Column(String, default=None)
     created_at = Column(DateTime, default=func.now())
@@ -23,7 +23,7 @@ class ChatRoom(Base):
 class ChatRoomBase(BaseModel):
     session_ID : str
     chatRoom_ID : str
-    name: str
+    name: str = ""
     created_at : datetime = datetime.now()
 
 def get_db():

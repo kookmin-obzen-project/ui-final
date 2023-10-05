@@ -4,7 +4,7 @@ sys.path.append("update-chat-server/server")
 from fastapi import FastAPI, HTTPException, Depends, status, APIRouter, Request, Response
 from pydantic import *
 from routes.session import * 
-
+from routes.JSON_format import *
 from db.model_chatRoom  import *
 import httpx
 ### query 문에서 .first() 는 object, .all() 은 list
@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get("/", status_code=status.HTTP_200_OK)
 async  def get_all_chatRoom(request: Request, response: Response, db: db_dependency):
     chatRoom = db.query(ChatRoom).all()
-    return chatRoom
+    return JSON_format("Success, Get All chatRoom", chatRoom)
 
 # chatRoom 테이블 중 특정 user 의 chatRoom 다 가져오기
 @router.get("/user", status_code=status.HTTP_200_OK)
@@ -26,7 +26,7 @@ async  def get_user_all_chatRoom(request:Request, response:Response, db: db_depe
     chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_ID).all()
     if len(chatRoom) == 0: 
         raise HTTPException(status_code=404, detail='chatRoom not found')
-    return chatRoom
+    return JSON_format("Success, Get User's chatRoom", chatRoom)
 
 # chatRoom 테이블 중 특정 user 의 특정 chatRoom 정보만 가져오기
 @router.get("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
@@ -39,7 +39,7 @@ async  def get_one_chatRoom(chatRoom_ID: str, request:Request, response:Response
         ).all()
     if len(chatRoom) == 0: 
         raise HTTPException(status_code=404, detail='chatRoom not found')
-    return chatRoom
+    return JSON_format("Success, Get User's one chatRoom", chatRoom)
     
 # chatRoom 생성하기 -> chatRoom 데이터를 받아 주입하는 방식
 @router.post("/chatRoom_Base", status_code=status.HTTP_201_CREATED)
@@ -47,10 +47,23 @@ async def create_chatRoom(chatRoom: ChatRoomBase,request:Request, response:Respo
     new_chatRoom = ChatRoom(**chatRoom.dict())
     db.add(new_chatRoom)
     db.commit()
+    return JSON_format("Success, Create chatRoom", new_chatRoom)
+    
+# chatRoom 생성하기 -> 쿼리스트링으로 chatRoom_ID 만 받아 생성하는 방식
+@router.post("/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
+async def create_chatRoom_ver2(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    session_ID = await get_session(request, response, db)
+    new_chatRoom = ChatRoom(
+        session_ID = session_ID,
+        chatRoom_ID = chatRoom_ID,
+    )
+    db.add(new_chatRoom)
+    db.commit()
+    return JSON_format("Success, Create chatRoom", new_chatRoom)
 
-# chatRoom 생성하기 -> 쿼리스트링으로 chatRoom_ID, name 만 받아 생성하는 방식
+# chatRoom 생성하기 -> 쿼리스트링으로 chatRoom_ID, name 을 받아 생성하는 방식
 @router.post("/{chatRoom_ID}/{name}", status_code=status.HTTP_201_CREATED)
-async def create_chatRoom_ver2(chatRoom_ID: str, name: str ,request:Request, response:Response, db: db_dependency):
+async def create_chatRoom_ver3(chatRoom_ID: str, name: str, request:Request, response:Response, db: db_dependency):
     session_ID = await get_session(request, response, db)
     new_chatRoom = ChatRoom(
         session_ID = session_ID,
@@ -59,9 +72,10 @@ async def create_chatRoom_ver2(chatRoom_ID: str, name: str ,request:Request, res
     )
     db.add(new_chatRoom)
     db.commit()
+    return JSON_format("Success, Create chatRoom", new_chatRoom)
 
 # chatRoom sessionID 로 필터링 후 채팅방 삭제하기
-@router.delete("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
+@router.delete("/{chatRoom_ID}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_one_chatRoom(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
     session_ID = await get_session(request, response, db)
     deleted = db.query(ChatRoom).filter(
@@ -73,19 +87,21 @@ async def delete_one_chatRoom(chatRoom_ID: str, request:Request, response:Respon
         raise HTTPException(status_code=404, detail='chatRoom not found')
     db.delete(deleted)
     db.commit()
+    return JSON_format(f"Success, Delete {chatRoom_ID} chatRoom", deleted)
     
 
 # chatRoom sessionID 로 필터링 후 채팅방 이름 업데이트
-@router.put("/{chatRoom_ID}/{name}", status_code=status.HTTP_200_OK)
-async def update_name_chatRoom(chatRoom_ID: str, name: str, request:Request, response:Response, db: db_dependency):
+@router.put("/{chatRoom_ID}/{new_name}", status_code=status.HTTP_200_OK)
+async def update_name_chatRoom(chatRoom_ID: str, new_name: str, request:Request, response:Response, db: db_dependency):
     session_ID = await get_session(request, response, db)
-    deleted = db.query(ChatRoom).filter(
+    updated= db.query(ChatRoom).filter(
         and_(
             ChatRoom.session_ID == session_ID,
             ChatRoom.chatRoom_ID == chatRoom_ID)
         ).first()
-    if deleted is None:
+    if updated is None:
         raise HTTPException(status_code=404, detail='chatRoom not found')
-    deleted.name = name
+    updated.name = new_name
     db.commit()
+    return JSON_format("Success, Update chatRoom name", updated)
     
