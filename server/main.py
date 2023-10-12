@@ -1,18 +1,25 @@
 import sys
 sys.path.append("update-chat-server/server")
 
-
-from pydantic import *
+import subprocess
 from fastapi import FastAPI, HTTPException, Depends, status
-from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from routes import chats
-from db.model_chat import Chat
+from routes import chats, chatAnswer, chatQuestion, chatRoom, session
+from db.model_chatRoom import *
+from db.model_chatQuestion import *
+from db.model_chatAnswer import *
+from db.model_chat import *
+from db.model_session import *
 from db.db import *
+from db import scheduler
 
 app = FastAPI()
 Chat.metadata.create_all(bind=engine)
+ChatAnswer.metadata.create_all(bind=engine)
+ChatQuestion.metadata.create_all(bind=engine)
+ChatRoom.metadata.create_all(bind=engine)
+Session.metadata.create_all(bind=engine)
 
 origins = [
      # "http://localhost:3000",
@@ -33,7 +40,12 @@ app.add_middleware(
 
 @app.get('/')
 async def home():
+    
     return {'msg': 'main.py'}
 
 app.include_router(chats.router, prefix="/chats")
-#pp.include_router(router=ctrl_router)
+app.include_router(chatRoom.router, prefix="/chatRoom")
+app.include_router(chatAnswer.router, prefix="/chatAnswer")
+app.include_router(chatQuestion.router, prefix="/chatQuestion")
+app.include_router(session.router, prefix="/session")
+

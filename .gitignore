@@ -27,3 +27,7 @@ yarn-error.log*
 .env
 **__pycache__
 **.env
+**obzen_DB_schema.sql
+
+# Jetbrains
+.idea

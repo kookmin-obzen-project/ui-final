@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ChatListItem from "./ChatListItem";
 import AddChatButton from "./AddChatButton";
 import { v4 as uuidv4 } from 'uuid';
+import "../../App.css";
 
 export default function ChatList({
   isChatListVisible, 
