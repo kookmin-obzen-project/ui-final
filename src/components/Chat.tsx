@@ -116,13 +116,13 @@ export default function Chats({
                 } mb-10`}
               >
                 {message.sender === "chatbot" && (
+                <div>
                   <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
                     {message.text}
+                    </div>
                     <div className="mt-2 flex items-center">
-                      <span
-                        onClick={handleToggleGraph}
-                        className="cursor-pointer underline text-sm mr-2"
-                      >
+                      <span onClick={handleToggleGraph} 
+                      className="cursor-pointer underline text-sm mr-2">
                         상세보기
                       </span>
                       <span className="cursor-pointer underline text-sm">
