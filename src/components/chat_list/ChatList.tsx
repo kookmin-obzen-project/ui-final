@@ -7,14 +7,12 @@ import "../../App.css";
 export default function ChatList({
   isChatListVisible, 
   onChatListToggle, 
-  userSessionID,
   chatSessionID,
   onUpdateChatSessionID,
   chatService,
 }: {
   isChatListVisible: boolean;
   onChatListToggle: () => void;
-  userSessionID: string | null; 
   chatSessionID: string | null;
   onUpdateChatSessionID: (selectedSessionID: string) => void; 
   chatService: ChatService;

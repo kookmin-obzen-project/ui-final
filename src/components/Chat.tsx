@@ -5,11 +5,9 @@ import NewChatForm from "./NewChatForm";
 
 export default function Chats({
   chatService,
-  userSessionID, 
   chatSessionID,
 }: {
   chatService: ChatService;
-  userSessionID: string | null;
   chatSessionID: string | null; 
 }) {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
@@ -20,7 +18,7 @@ export default function Chats({
 
   const [initialExplanationShown, setInitialExplanationShown] = useState(true);
 
-  if (userSessionID === null || chatSessionID === null) {
+  if (chatSessionID === null) {
     return <div className="text-red-500">유효한 세션 ID가 필요합니다.</div>;
   }  
 
@@ -35,7 +33,7 @@ export default function Chats({
     if (newMessage.sender === "user") {
       // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
       try {
-        const response = await chatService.sendMessage(userSessionID, newMessage.text);
+        const response = await chatService.sendMessage(newMessage.text);
         
         const chatbotResponse = {
           sender: "chatbot",
