@@ -40,9 +40,7 @@ export default function Chats({
     }
 
     if (newMessage.sender === "user") {
-      // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
       try {
-        
         const roomResponse = await chatService.createChatQuestion_chatRoomID(chatSessionID); 
         const questionIdResponse = await chatService.getChatQuestionID(chatSessionID);
         const questionResponse = await chatService.updateChatQuestion_text(chatSessionID, questionIdResponse["data"]["chat_id"], newMessage.text)
@@ -50,7 +48,7 @@ export default function Chats({
         const answerResponse = await chatService.getChatAnswerIDandChatID(chatSessionID, questionIdResponse["data"]["chat_id"]);
         const chatbotResponse = {
           sender: "chatbot",
-          text: answerResponse["data"]["text"], // 서버 응답의 answer 필드를 채팅창에 표시
+          text: answerResponse["data"]["text"], 
         };
 
         setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
