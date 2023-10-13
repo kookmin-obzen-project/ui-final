@@ -7,8 +7,6 @@ import DashBoard from "./components/DashBoard";
 
 function App({ chatService }: { chatService: ChatService }) {
 
-
-
   return (
     <>
       <Header />

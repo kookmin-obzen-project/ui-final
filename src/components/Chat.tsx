@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Graph from "./graph/Graph";
 import ChatService from "../service/chat";
 import NewChatForm from "./NewChatForm";
@@ -18,6 +18,15 @@ export default function Chats({
 
   const [initialExplanationShown, setInitialExplanationShown] = useState(true);
 
+  // const fetchChatMessages = async () => {
+  //   try {
+  //     const response = await chatService.getChatQuestionDB(); // Assuming chatService has a method to fetch chat questions
+  //     setMessages(response);
+  //   } catch (error) {
+  //     console.error("Error fetching chat questions:", error);
+  //   }
+  // };
+
   if (chatSessionID === null) {
     return <div className="text-red-500">유효한 세션 ID가 필요합니다.</div>;
   }  
@@ -33,11 +42,15 @@ export default function Chats({
     if (newMessage.sender === "user") {
       // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
       try {
-        const response = await chatService.sendMessage(newMessage.text);
         
+        const roomResponse = await chatService.createChatQuestion_chatRoomID(chatSessionID); 
+        const questionIdResponse = await chatService.getChatQuestionID(chatSessionID);
+        const questionResponse = await chatService.updateChatQuestion_text(chatSessionID, questionIdResponse["data"]["chat_id"], newMessage.text)
+        
+        const answerResponse = await chatService.getChatAnswerIDandChatID(chatSessionID, questionIdResponse["data"]["chat_id"]);
         const chatbotResponse = {
           sender: "chatbot",
-          text: response.answer, // 서버 응답의 answer 필드를 채팅창에 표시
+          text: answerResponse["data"]["text"], // 서버 응답의 answer 필드를 채팅창에 표시
         };
 
         setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
