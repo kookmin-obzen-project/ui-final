@@ -17,14 +17,12 @@ class ChatQuestion(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text, default=None)
     chatRoom_ID = Column(String(255), unique=True)
-    session_ID = Column(String(255))
     created_at = Column(DateTime, default=func.now())
 
 
 class ChatQuestionBase(BaseModel):
     text: str
     chatRoom_ID: str
-    session_ID: str
     created_at: datetime = datetime.now()
 
 

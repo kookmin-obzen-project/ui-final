@@ -24,25 +24,15 @@ async  def get_all_chatRoom(request: Request, response: Response, db: db_depende
 # chatRoom 테이블 중 특정 user 의 chatRoom 다 가져오기
 @router.get("/user", status_code=status.HTTP_200_OK)
 async  def get_user_all_chatRoom(request:Request, response:Response, db: db_dependency):
-    try:
-        result = await get_session_id(request, response, db) # 기존 session_id 없다면 생성 후 return 받음. 
-        session_ID = result["data"]["session_id"]
-        chatRoom = db.query(ChatRoom).filter(ChatRoom.session_ID == session_ID).all()
-        if len(chatRoom) == 0: 
-            raise HTTPException(status_code=404, detail='chatRoom not found')
-        return JSON_format(f"Success, Get User's All chatRoom", chatRoom)
-    except TypeError: # get_session_id 가 제대로 작동 안할 경우
-        raise HTTPException(status_code=404, detail='Not Found Your Session ID')
-    
+    chatRoom = db.query(ChatRoom).all()
+    return JSON_format("Success, Get All chatRoom", chatRoom)
+
 # chatRoom 테이블 중 특정 user 의 특정 chatRoom 정보만 가져오기
 @router.get("/{chatRoom_ID}", status_code=status.HTTP_200_OK)
 async  def get_one_chatRoom(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
     try:
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         chatRoom = db.query(ChatRoom).filter(
             and_(
-                ChatRoom.session_ID == session_ID,
                 ChatRoom.chatRoom_ID == chatRoom_ID)
             ).all()
         if len(chatRoom) == 0: 
@@ -55,18 +45,14 @@ async  def get_one_chatRoom(chatRoom_ID: str, request:Request, response:Response
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_chatRoom_ver0(request:Request, response:Response, db: db_dependency):
     try: 
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         chatRoom_ID = str(uuid.uuid4())
         new_chatRoom = ChatRoom(
-            session_ID = session_ID,
             chatRoom_ID = chatRoom_ID,
         )
         db.add(new_chatRoom)
         db.commit()
         return JSON_format("Success, Create chatRoom", 
-                           {"session_ID": session_ID, 
-                            "chatRoom_ID": chatRoom_ID} )
+                           { "chatRoom_ID": chatRoom_ID} )
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
     
@@ -90,37 +76,30 @@ async def create_chatRoom_ver1(chatRoom: ChatRoomBase,request:Request, response:
     # ]
     new_chatRoom = ChatRoom(**chatRoom.dict())
     if  db.query(ChatRoom).filter(and_(
-                ChatRoom.session_ID == new_chatRoom.session_ID,
                 ChatRoom.chatRoom_ID == new_chatRoom.chatRoom_ID)
             ).all(): 
         raise HTTPException(status_code=404, detail=f'chatRoom_ID: {new_chatRoom.chatRoom_ID} already exists')
     db.add(new_chatRoom)
     db.commit()
     return JSON_format("Success, Create chatRoom", 
-                       {"session_ID": new_chatRoom.session_ID, 
-                        "chatRoom_ID": new_chatRoom.chatRoom_ID})
+                       {"chatRoom_ID": new_chatRoom.chatRoom_ID})
 
     
 # chatRoom 생성하기_ver2 -> 쿼리스트링으로 chatRoom_ID 만 받아 생성하는 방식
 @router.post("/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
 async def create_chatRoom_ver2(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
     try: 
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         if  db.query(ChatRoom).filter(and_(
-                ChatRoom.session_ID == session_ID,
                 ChatRoom.chatRoom_ID == chatRoom_ID)
             ).all(): 
             raise HTTPException(status_code=404, detail=f'chatRoom_ID: {chatRoom_ID} already exists')
         new_chatRoom = ChatRoom(
-            session_ID = session_ID,
             chatRoom_ID = chatRoom_ID,
         )
         db.add(new_chatRoom)
         db.commit()
         return JSON_format("Success, Create chatRoom", 
-                           {"session_ID": session_ID, 
-                            "chatRoom_ID": chatRoom_ID} )
+                           {"chatRoom_ID": chatRoom_ID} )
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
 
@@ -128,23 +107,18 @@ async def create_chatRoom_ver2(chatRoom_ID: str, request:Request, response:Respo
 @router.post("/{chatRoom_ID}/{name}", status_code=status.HTTP_201_CREATED)
 async def create_chatRoom_ver3(chatRoom_ID: str, name: str, request:Request, response:Response, db: db_dependency):
     try:
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         if  db.query(ChatRoom).filter(and_(
-                ChatRoom.session_ID == session_ID,
                 ChatRoom.chatRoom_ID == chatRoom_ID)
             ).all(): 
             raise HTTPException(status_code=404, detail=f'chatRoom_ID: {chatRoom_ID} already exists')
         new_chatRoom = ChatRoom(
-            session_ID = session_ID,
             chatRoom_ID = chatRoom_ID,
             name = name
         )
         db.add(new_chatRoom)
         db.commit()
         return JSON_format("Success, Create chatRoom", 
-                           {"session_ID": session_ID, 
-                            "chatRoom_ID": chatRoom_ID, 
+                           {"chatRoom_ID": chatRoom_ID, 
                             "name":name} )
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
@@ -163,11 +137,8 @@ async def delete_All_chatRoom(request:Request, response:Response, db: db_depende
 @router.delete("/{chatRoom_ID}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_one_chatRoom(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
     try:
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         deleted = db.query(ChatRoom).filter(
             and_(
-                ChatRoom.session_ID == session_ID,
                 ChatRoom.chatRoom_ID == chatRoom_ID)
             ).first()
         if deleted is None:
@@ -175,8 +146,7 @@ async def delete_one_chatRoom(chatRoom_ID: str, request:Request, response:Respon
         db.delete(deleted)
         db.commit()
         return JSON_format(f"Success, Delete {chatRoom_ID} chatRoom", 
-                           {"session_ID": session_ID, 
-                            "chatRoom_ID": chatRoom_ID})
+                           {"chatRoom_ID": chatRoom_ID})
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
     
@@ -184,11 +154,8 @@ async def delete_one_chatRoom(chatRoom_ID: str, request:Request, response:Respon
 @router.put("/{chatRoom_ID}/{new_name}", status_code=status.HTTP_200_OK)
 async def update_name_chatRoom(chatRoom_ID: str, new_name: str, request:Request, response:Response, db: db_dependency):
     try:
-        result = await get_session_id(request, response, db)
-        session_ID = result["data"]["session_id"]
         updated= db.query(ChatRoom).filter(
             and_(
-                ChatRoom.session_ID == session_ID,
                 ChatRoom.chatRoom_ID == chatRoom_ID)
             ).first()
         old_name = updated.name
@@ -197,8 +164,7 @@ async def update_name_chatRoom(chatRoom_ID: str, new_name: str, request:Request,
         updated.name = new_name
         db.commit()
         return JSON_format(f"Success, Update chatRoom name, {old_name} -> {new_name}", 
-                           {"session_ID": session_ID, 
-                            "chatRoom_ID": chatRoom_ID, 
+                           {"chatRoom_ID": chatRoom_ID, 
                             "old name": old_name, 
                             "new_name": new_name})
     except TypeError: # get_session_id 가 제대로 작동 안할 경우

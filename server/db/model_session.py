@@ -17,13 +17,11 @@ class Session(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=func.now())
     expired_at = Column(DateTime, default=None)
-    session_ID = Column(String(255), unique=True)
 
 
 class SessionBase(BaseModel):
     created_at: datetime = datetime.now()
     expired_at: datetime = None
-    session_ID: str
 
 
 def get_db():
