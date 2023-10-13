@@ -137,7 +137,7 @@ export default function Chats({
               </div>
             ))}
           </div>
-          <NewChatForm onQuestionClick={handleMessages} chatSessionID={chatSessionID} />
+          <NewChatForm onQuestionClick={handleMessages} />
         </div>
         {showGraph && <Graph isGraphLoading={isGraphLoading} />}
       </div>
