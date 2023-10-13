@@ -36,10 +36,10 @@ export default function DashBoard({
       <ChatList
         isChatListVisible={isChatListVisible}
         onChatListToggle={handleToggleChatList}
-        userSessionID={userSessionID} 
+        userSessionID={userSessionID}
         chatSessionID={chatSessionID} // chatSessionID를 전달
         onUpdateChatSessionID={updateChatSessionID} // chatSessionID를 업데이트하는 함수를 전달
-      />      
+        chatService={chatService}      />      
       <Chats chatService={chatService} userSessionID={userSessionID} chatSessionID={chatSessionID}/>
     </div>
   );
