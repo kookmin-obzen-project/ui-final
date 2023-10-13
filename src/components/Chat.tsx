@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Graph from "./graph/Graph";
 import ChatService from "../service/chat";
 import NewChatForm from "./NewChatForm";
-import { v4 as uuidv4 } from "uuid";
-import Cookies from "js-cookie";
 
 export default function Chats({ chatService }: { chatService: ChatService }) {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
@@ -23,14 +21,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
     if (newMessage.sender === "user") {
       // 사용자 메시지를 서버로 전송하고 챗봇 응답을 반환
       try {
-        // SessionID 생성
-        const sessionID = Cookies.get("sessionID") || uuidv4();
-        Cookies.set("sessionID", sessionID, { expires: 1 });
-
-        const response = await chatService.sendMessage(
-          sessionID,
-          newMessage.text
-        );
+        const response = await chatService.sendMessage(newMessage.text);
         const chatbotResponse = {
           sender: "chatbot",
           text: response.answer, // 서버 응답의 answer 필드를 채팅창에 표시

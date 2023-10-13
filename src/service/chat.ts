@@ -13,10 +13,10 @@ export default class ChatService {
     });
   }
 
-  async sendMessage(sessionID: string, message: string) {
+  async sendMessage(message: string) {
     return this.http.fetch(`/chats/reflect`, {
       method: "POST",
-      body: JSON.stringify({ sessionID: sessionID, text: message }), // 메시지를 서버로 전송
+      body: JSON.stringify({ text: message }), // 메시지를 서버로 전송
     });
   }
 
@@ -33,4 +33,3 @@ export default class ChatService {
     });
   }
 }
-
