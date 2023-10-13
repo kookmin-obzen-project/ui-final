@@ -3,9 +3,10 @@ import { FaPaperPlane } from "react-icons/fa";
 
 interface NewChatFormProps {
   onQuestionClick: (newMessage: any) => void;
+  chatSessionID: string | null; 
 }
 
-export default function NewChatForm({ onQuestionClick }: NewChatFormProps) {
+export default function NewChatForm({ onQuestionClick, chatSessionID }: NewChatFormProps) {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [inputText, setInputText] = useState("");
 
