@@ -8,8 +8,8 @@ from db.model_chatRoom  import *
 from db.model_chatAnswer  import *
 from db.model_chatQuestion  import *
 from routes.session import *
-from fastapi import APIRouter, Request
 from routes.JSON_format import *
+import json
 
 app = FastAPI()
 router = APIRouter()
@@ -54,6 +54,27 @@ async def get_Room_one_chatQuestion(chatRoom_ID: str, chat_id: int, request:Requ
             else:
                 raise HTTPException(status_code=404, detail='Question does not exist')
         return JSON_format(f"Success, Get {chatRoom_ID}-{chat_id} chatQuestion", chatQuestion)
+    except TypeError: # get_session_id 가 제대로 작동 안할 경우
+        raise HTTPException(status_code=404, detail='Not Found Your Session ID')
+    
+# chatQuestion 생성 & text 추가 - 사용 중
+@router.post("/new/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
+async def create_chatQuestion_ver2_new(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    try:
+        request_body = await request.body()
+        json_data = json.loads(request_body)
+        text = json_data["text"]
+
+        new_chatQuestion = ChatQuestion(
+            chatRoom_ID = chatRoom_ID,
+            text = text
+        )
+        
+        db.add(new_chatQuestion)
+        db.commit()
+        return JSON_format("Success, Create chatQuestion", 
+                        {"chatRoom_ID": chatRoom_ID,
+                            "chat_id": new_chatQuestion.id, "text": text})
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
 

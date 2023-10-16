@@ -135,6 +135,16 @@ export default class ChatService {
     });
   }
   // chatQuestion -----------------------------------------------
+
+  // 변경된 함수 - 사용 중
+  async new_createChatQuestion_chatRoomID(chatRoom_ID: string, text: object) {
+    return await this.http.fetch(`/chatQuestion/new/${chatRoom_ID}`, {
+      method: "POST",
+      body: JSON.stringify(text),
+      credentials: 'include',
+    });
+  }
+
   async getChatQuestionDB() {
     return this.http.fetch(`/chatQuestion`, {
       method: "GET",
@@ -145,7 +155,6 @@ export default class ChatService {
   async getChatQuestionID(chatRoom_ID: string) {
     return this.http.fetch(`/chatQuestion/${chatRoom_ID}`, {
       method: "GET",
-      body: JSON.stringify({}),
     });
   }
 
@@ -205,6 +214,16 @@ export default class ChatService {
       body: JSON.stringify({}),
     });
   }
+
+  // 변경된 함수 - 사용 중
+  async new_createChatAnswer_chatRoomID(chatRoom_ID: string, text: object) {
+    return await this.http.fetch(`/chatAnswer/new/${chatRoom_ID}`, {
+      method: "POST",
+      body: JSON.stringify(text),
+      credentials: 'include',
+    });
+  }
+
 
   async createChatAnswer_chatRoomID(chatRoom_ID: string) {
     return this.http.fetch(`/chatAnswer/${chatRoom_ID}`, {

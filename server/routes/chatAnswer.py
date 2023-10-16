@@ -56,6 +56,29 @@ async def get_Room_one_chatAnswer(chatRoom_ID: str, chat_id: int, request:Reques
         return JSON_format(f"Success, Get {chatRoom_ID}-{chat_id} chatAnswer", chatAnswer)
     except TypeError: # get_session_id 가 제대로 작동 안할 경우
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
+    
+# chatAnswer 생성 & text 추가 - 사용 중
+@router.post("/new/{chatRoom_ID}", status_code=status.HTTP_201_CREATED)
+async def create_chatAnswer_ver2_new(chatRoom_ID: str, request:Request, response:Response, db: db_dependency):
+    try:
+        request_body = await request.body()
+        json_data = json.loads(request_body)
+        text = json_data["text"]
+        
+        # obzai 의 답변을 넣을 부분 !! 
+
+        new_chatAnswer = ChatAnswer(
+            chatRoom_ID = chatRoom_ID,
+            text = text
+        )
+        
+        db.add(new_chatAnswer)
+        db.commit()
+        return JSON_format("Success, Create chatAnswer", 
+                        {"chatRoom_ID": chatRoom_ID,
+                            "chat_id": new_chatAnswer.id, "text": text})
+    except TypeError: # get_session_id 가 제대로 작동 안할 경우
+        raise HTTPException(status_code=404, detail='Not Found Your Session ID')
 
 # chatAnswer 생성하기
 @router.post("/chatAnswer_Base", status_code=status.HTTP_201_CREATED)

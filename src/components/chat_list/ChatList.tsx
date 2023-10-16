@@ -40,8 +40,10 @@ export default function ChatList({
   const handleModalConfirm = async () => {
     if (newChatName.trim() !== "") {
 
-      const chatSessionID = await chatService.createChatRoom();
+      const response = await chatService.createChatRoom();
+      const chatSessionID = response["data"]["chatRoom_ID"]
       console.log(chatSessionID);
+
       // 채팅방 목록에 채팅방과 세션 ID 추가
       setChats((prevChats) => [...prevChats, { chatName: newChatName, chatSessionID }]);
       setSelectedChat(newChatName);
