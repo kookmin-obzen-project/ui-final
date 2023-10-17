@@ -40,10 +40,13 @@ export default function ChatList({
   const handleModalConfirm = async () => {
     if (newChatName.trim() !== "") {
 
-      const response = await chatService.createChatRoom();
+      const response = await chatService.new_createChatRoom({"name":newChatName});
+      // response = {message: "Success, Create chatRoom", 
+      //            data: {chatRoom_ID: "fccd3dc3-7316-433d-91ba-449f8521f7dc", name: "123"}}
+      console.log("response: ", response)
       const chatSessionID = response["data"]["chatRoom_ID"]
-      console.log(chatSessionID);
-
+      // chatSessionID = fccd3dc3-7316-433d-91ba-449f8521f7dc 
+      console.log("when chatRoom create chatSessionID: ", chatSessionID)
       // 채팅방 목록에 채팅방과 세션 ID 추가
       setChats((prevChats) => [...prevChats, { chatName: newChatName, chatSessionID }]);
       setSelectedChat(newChatName);

@@ -43,14 +43,15 @@ export default function Chats({
       try {
         // newMessage -> {sender: "user", text: "123"} 
         // object 그대로 body 에 넣어 server 에 전달. text 정보 빼내어 사용. 변경 시 chat.ts 내 parameter type 변경 필수.
-
+        console.log("when chat create, chatSessionID: ", chatSessionID)
         const response = await chatService.new_createChatAnswer_chatRoomID(chatSessionID, newMessage); 
+        console.log("when chat create, chat Info: ", response)
         //response = 
         // {message: "Success, Create chatQuestion", 
         // data: {chatRoom_ID: "13de25b8-6a06-4eb5-a411-e0c9bb23de9d", 
         //  chat_id: 44, 
         //  text: "123"}}
-
+        
         const chatbotResponse = {
           sender: "chatbot",
           text: response["data"]["text"], 

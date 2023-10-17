@@ -72,6 +72,14 @@ export default class ChatService {
 
     // chatRoom -----------------------------------------------
 
+  // 변경된 함수 - 사용 중
+  async new_createChatRoom(name: object) {
+    return this.http.fetch(`/chatRoom/new`, {
+      method: "POST",
+      body: JSON.stringify(name),
+    });
+  }
+
   async getChatRoomDB() {
     return this.http.fetch(`/chatRoom`, {
       method: "GET",

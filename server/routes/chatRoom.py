@@ -40,6 +40,28 @@ async  def get_one_chatRoom(chatRoom_ID: str, request:Request, response:Response
         return JSON_format(f"Success, Get User's one chatRoom", chatRoom)
     except TypeError: 
         raise HTTPException(status_code=404, detail='Not Found Your Session ID')
+    
+# chatRoom 생성 & name 설정
+@router.post("/new", status_code=status.HTTP_201_CREATED)
+async def new_create_chatRoom_ver0(request:Request, response:Response, db: db_dependency):
+    try: 
+        request_body = await request.body()
+        json_data = json.loads(request_body)
+        name = json_data["name"]
+        
+        chatRoom_ID = str(uuid.uuid4())
+        new_chatRoom = ChatRoom(
+            chatRoom_ID = chatRoom_ID,
+            name = name,
+        )
+        
+        db.add(new_chatRoom)
+        db.commit()
+        return JSON_format("Success, Create chatRoom", 
+                           { "chatRoom_ID": chatRoom_ID,
+                            "name": name})
+    except TypeError: # get_session_id 가 제대로 작동 안할 경우
+        raise HTTPException(status_code=404, detail='Not Found Your Session ID')
 
 # chatRoom 생성하기_ver0 -> 랜덤 ID 주입하여 생성하는 방식
 @router.post("/", status_code=status.HTTP_201_CREATED)
