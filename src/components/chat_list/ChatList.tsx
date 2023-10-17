@@ -1,23 +1,31 @@
 import React, { useState } from "react";
 import ChatListItem from "./ChatListItem";
+import ChatService  from "./../../service/chat";
 import AddChatButton from "./AddChatButton";
 import "../../App.css";
 
 export default function ChatList({
-  isChatListVisible, // isChatListVisible를 props로 받음
-  onChatListToggle, // onChatListToggle을 props로 받음
+  isChatListVisible, 
+  onChatListToggle, 
+  chatSessionID,
+  onUpdateChatSessionID,
+  chatService,
 }: {
   isChatListVisible: boolean;
   onChatListToggle: () => void;
+  chatSessionID: string | null;
+  onUpdateChatSessionID: (selectedSessionID: string) => void; 
+  chatService: ChatService;
 }) {
-  const [chats, setChats] = useState<string[]>(["1번 채팅창"]);
+  const [chats, setChats] = useState<{ chatName: string; chatSessionID: string }[]>([]);
   const [selectedChat, setSelectedChat] = useState<string>("1번 채팅창");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [newChatName, setNewChatName] = useState<string>("");
-
-  const handleChatClick = (chatName: string) => {
+ 
+  const handleChatClick = (chatName: string, chatSessionID: string) => {
     setSelectedChat(chatName);
-  };
+    onUpdateChatSessionID(chatSessionID); 
+  };  
 
   const handleAddChat = () => {
     setIsModalOpen(true); // 모달 열기
@@ -28,48 +36,47 @@ export default function ChatList({
     setNewChatName(""); // 입력 필드 초기화
   };
 
-  // ~번 + 사용자가 재정의한 채팅방 이름 형식으로 저장
-  /*
-  const handleModalConfirm = () => {
-    // 사용자가 입력한 값으로 채팅을 추가하고 모달을 닫기
-    if (newChatName.trim() !== "") {
-      const updatedChatName = `${chats.length + 1}번 ${newChatName}`;
-      setChats((prevChats) => [...prevChats, updatedChatName]);
-      setSelectedChat(updatedChatName);
-    }
-    setIsModalOpen(false); 
-    setNewChatName(""); 
-  }; */
-
   // 사용자가 재정의한 채팅방 이름만 저장
-  const handleModalConfirm = () => {
+  const handleModalConfirm = async () => {
     if (newChatName.trim() !== "") {
-      setChats((prevChats) => [...prevChats, newChatName]);
+
+      const response = await chatService.new_createChatRoom({"name":newChatName});
+      // response = {message: "Success, Create chatRoom", 
+      //            data: {chatRoom_ID: "fccd3dc3-7316-433d-91ba-449f8521f7dc", name: "123"}}
+      console.log("response: ", response)
+      const chatSessionID = response["data"]["chatRoom_ID"]
+      // chatSessionID = fccd3dc3-7316-433d-91ba-449f8521f7dc 
+      console.log("when chatRoom create chatSessionID: ", chatSessionID)
+      // 채팅방 목록에 채팅방과 세션 ID 추가
+      setChats((prevChats) => [...prevChats, { chatName: newChatName, chatSessionID }]);
       setSelectedChat(newChatName);
+      onUpdateChatSessionID(chatSessionID);
     }
     setIsModalOpen(false);
     setNewChatName("");
   };
-
+ 
 
   const handleRemoveChat = (chatName: string) => {
-    const updatedChats = chats.filter((chat) => chat !== chatName);
+    const updatedChats = chats.filter((chat) => chat.chatName !== chatName);
     setChats(updatedChats);
-
+  
     if (selectedChat === chatName) {
       setSelectedChat("");
     }
   };
+  
 
   return (
     <div className={`overflow-auto w-1/5 py-4 px-2 border-r border-default-border bg-list-background ${!isChatListVisible ? 'hidden' : ''}`}>
       <AddChatButton onAddChat={handleAddChat} onChatListToggle={onChatListToggle} isChatListVisible={isChatListVisible} />
-      {chats.map((chatName) => (
-        <ChatListItem
-          key={chatName}
-          chatName={chatName}
-          isSelected={selectedChat === chatName}
-          onChatClick={handleChatClick}
+      {chats.map((chat) => (
+        <ChatListItem 
+          key={chat.chatName}
+          chatName={chat.chatName}
+          isSelected={selectedChat === chat.chatName}
+          chatSessionID={chatSessionID}
+          onChatClick={(chatName) => handleChatClick(chatName, chat.chatSessionID)}
           onTrashClick={handleRemoveChat}
         />
       ))}

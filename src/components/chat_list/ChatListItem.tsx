@@ -4,13 +4,15 @@ import { BiComment, BiTrash } from "react-icons/bi";
 interface ChatListItemProps {
   chatName: string;
   isSelected: boolean;
-  onChatClick: (chatName: string) => void;
+  chatSessionID: string | null; 
+  onChatClick: (chatName: string, sessionID: string | null) => void;
   onTrashClick: (chatName: string) => void;
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({
   chatName,
   isSelected,
+  chatSessionID, 
   onChatClick,
   onTrashClick,
 }) => {
@@ -28,7 +30,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
     <div
       role="button"
       className={`flex py-3 px-3 items-center gap-3 relative rounded-md cursor-pointer break-all pr-14 hover:bg-list-selected group ${chatBackgroundClass}`}
-      onClick={() => onChatClick(chatName)}
+      onClick={() => onChatClick(chatName, chatSessionID)}
       onMouseEnter={() => setIsHovered(true)} // Set hover state to true
       onMouseLeave={() => setIsHovered(false)} // Set hover state to false
       style={{ marginBottom: "8px" }}
