@@ -1,6 +1,6 @@
 export default class HttpClient {
   constructor(baseURL) {
-    this.baseURL = "http://localhost:8080";
+    this.baseURL = "http://43.202.78.244";
   }
 
   async fetch(url, options) {
