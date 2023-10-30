@@ -14,14 +14,12 @@ class ChatRoom(Base):
     __tablename__ = 'chatRoom'
 
     id = Column(Integer, primary_key=True, index=True)
-    session_ID = Column(String(255))
     chatRoom_ID = Column(String(255), unique=True)
     name = Column(String(255), default=None)
     created_at = Column(DateTime, default=func.now())
     
     
 class ChatRoomBase(BaseModel):
-    session_ID : str
     chatRoom_ID : str
     name: str = ""
     created_at : datetime = datetime.now()
