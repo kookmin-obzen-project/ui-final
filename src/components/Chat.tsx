@@ -8,7 +8,7 @@ export default function Chats({
   chatSessionID,
 }: {
   chatService: ChatService;
-  chatSessionID: string | null; 
+  chatSessionID: string | null;
 }) {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     []
@@ -29,8 +29,7 @@ export default function Chats({
 
   if (chatSessionID === null) {
     return <div className="text-red-500">유효한 세션 ID가 필요합니다.</div>;
-  }  
-
+  }
 
   const handleMessages = async (newMessage: any) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -41,20 +40,28 @@ export default function Chats({
 
     if (newMessage.sender === "user") {
       try {
-        // newMessage -> {sender: "user", text: "123"} 
+        // newMessage -> {sender: "user", text: "123"}
         // object 그대로 body 에 넣어 server 에 전달. text 정보 빼내어 사용. 변경 시 chat.ts 내 parameter type 변경 필수.
-        console.log("when chat create, chatSessionID: ", chatSessionID)
-        const response = await chatService.new_createChatAnswer_chatRoomID(chatSessionID, newMessage); 
-        console.log("when chat create, chat Info: ", response)
-        //response = 
-        // {message: "Success, Create chatQuestion", 
-        // data: {chatRoom_ID: "13de25b8-6a06-4eb5-a411-e0c9bb23de9d", 
-        //  chat_id: 44, 
+        console.log("when chat create, chatSessionID: ", chatSessionID);
+        await chatService.new_createChatQuestion_chatRoomID(
+          chatSessionID,
+          newMessage
+        );
+
+        const response = await chatService.new_createChatAnswer_chatRoomID(
+          chatSessionID,
+          newMessage
+        );
+        console.log("when chat create, chat Info: ", response);
+        //response =
+        // {message: "Success, Create chatQuestion",
+        // data: {chatRoom_ID: "13de25b8-6a06-4eb5-a411-e0c9bb23de9d",
+        //  chat_id: 44,
         //  text: "123"}}
-        
+
         const chatbotResponse = {
           sender: "chatbot",
-          text: response["data"]["text"], 
+          text: response["data"]["text"],
         };
 
         setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
@@ -131,13 +138,15 @@ export default function Chats({
                 } mb-10`}
               >
                 {message.sender === "chatbot" && (
-                <div>
-                  <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
-                    {message.text}
+                  <div>
+                    <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
+                      {message.text}
                     </div>
                     <div className="mt-2 flex items-center">
-                      <span onClick={handleToggleGraph} 
-                      className="cursor-pointer underline text-sm mr-2">
+                      <span
+                        onClick={handleToggleGraph}
+                        className="cursor-pointer underline text-sm mr-2"
+                      >
                         상세보기
                       </span>
                       <span className="cursor-pointer underline text-sm">
