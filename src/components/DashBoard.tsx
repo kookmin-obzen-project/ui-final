@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Chats from "./Chat";
 import ChatService from "../service/chat";
 import ChatList from "./chat_list/ChatList";
@@ -25,7 +25,10 @@ export default function DashBoard({
         onShowChatList={handleToggleChatList}
         isChatListVisible={isChatListVisible}
       />
-      <ChatList isChatListVisible={isChatListVisible} onChatListToggle={handleToggleChatList} />
+      <ChatList
+        isChatListVisible={isChatListVisible}
+        onChatListToggle={handleToggleChatList}
+      />
       <Chats chatService={chatService} />
     </div>
   );
