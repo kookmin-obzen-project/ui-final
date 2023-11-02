@@ -14,8 +14,7 @@ export default class ChatService {
   }
 
   async sendMessage(message: string) {
-    const url = new URL("/search", window.location.origin);
-    url.searchParams.append("text", message);
+    const url = `/search/?q=${message}`;
     return this.http.fetch(url, {
       method: "GET",
     });
