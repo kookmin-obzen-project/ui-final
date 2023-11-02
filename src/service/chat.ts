@@ -14,10 +14,15 @@ export default class ChatService {
   }
 
   async sendMessage(message: string) {
-    return this.http.fetch(`/chats/reflect`, {
-      method: "POST",
-      body: JSON.stringify({ text: message }), // 메시지를 서버로 전송
+    const url = new URL("/search", window.location.origin);
+    url.searchParams.append("text", message);
+    return this.http.fetch(url, {
+      method: "GET",
     });
+    // return this.http.fetch(`/chats/reflect`, {
+    //   method: "POST",
+    //   body: JSON.stringify({ text: message }), // 메시지를 서버로 전송
+    // });
   }
 
   async deleteChat(chatId: number) {
