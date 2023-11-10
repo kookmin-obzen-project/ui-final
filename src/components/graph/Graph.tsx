@@ -6,9 +6,10 @@ import { FaCircleNotch } from "react-icons/fa";
 
 interface GraphProps {
   isGraphLoading: boolean;
+  query : string;
 }
 
-const Graph: React.FC<GraphProps> = ({ isGraphLoading }) => {
+const Graph: React.FC<GraphProps> = ({ isGraphLoading, query }) => {
   return (
     <div className="px-6 py-2 flex flex-col">
       <DetailHeader
@@ -17,6 +18,7 @@ const Graph: React.FC<GraphProps> = ({ isGraphLoading }) => {
             ? "" // 로딩 중일 때 빈 문자열로 처리
             : "최근 1개월동안 모바일 앱에 접속하지 않은 고객은"
         }
+        query={query}
       />
       {isGraphLoading ? (
         <div className="relative flex items-center justify-center h-48">
