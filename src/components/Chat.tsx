@@ -9,6 +9,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
   );
   const [showGraph, setShowGraph] = useState(false);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
+  const [query, setQuery] = useState(''); 
   const [initialExplanationShown, setInitialExplanationShown] = useState(true);
 
   const handleMessages = async (newMessage: any) => {
@@ -25,8 +26,10 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
         const chatbotResponse = {
           sender: "chatbot",
           text: response.answer, // 서버 응답의 answer 필드를 채팅창에 표시
+          query: response.query
+          
         };
-
+        setQuery(chatbotResponse.query);
         setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
       } catch (error) {
         console.error("Error sending message:", error);
@@ -101,8 +104,10 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
                 } mb-10`}
               >
                 {message.sender === "chatbot" && (
-                  <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
-                    {message.text}
+                  <div>
+                    <div className="bg-pastel-blue text-black p-4 rounded-lg inline-flex items-center justify-end relative">
+                      {message.text}
+                    </div>
                     <div className="mt-2 flex items-center">
                       <span
                         onClick={handleToggleGraph}
@@ -126,7 +131,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
           </div>
           <NewChatForm onQuestionClick={handleMessages} />
         </div>
-        {showGraph && <Graph isGraphLoading={isGraphLoading} />}
+        {showGraph && <Graph isGraphLoading={isGraphLoading} query = {query} />}
       </div>
     </div>
   );
