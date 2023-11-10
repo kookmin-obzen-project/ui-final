@@ -10,6 +10,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
   const [showGraph, setShowGraph] = useState(false);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
   const [query, setQuery] = useState(''); 
+  const [ans, setAns] = useState(''); 
   const [initialExplanationShown, setInitialExplanationShown] = useState(true);
 
   const handleMessages = async (newMessage: any) => {
@@ -30,6 +31,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
           
         };
         setQuery(chatbotResponse.query);
+        setAns(chatbotResponse.text);
         setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
       } catch (error) {
         console.error("Error sending message:", error);
@@ -131,7 +133,7 @@ export default function Chats({ chatService }: { chatService: ChatService }) {
           </div>
           <NewChatForm onQuestionClick={handleMessages} />
         </div>
-        {showGraph && <Graph isGraphLoading={isGraphLoading} query = {query} />}
+        {showGraph && <Graph isGraphLoading={isGraphLoading} query = {query} ans = {ans} />}
       </div>
     </div>
   );
