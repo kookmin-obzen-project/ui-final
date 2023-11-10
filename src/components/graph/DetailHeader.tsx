@@ -23,8 +23,6 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({ detailInfo , query }) => {
     <div className="flex justify-between items-center my-3">
       <div className="">
         <span className="text-detail-black font-bold">{detailInfo}</span>
-        <span className="text-obzen-purple font-bold ml-2">2422</span>
-        <span>명</span>
       </div>
       <button className="text-default-blue font-bold ml-2" onClick={openPopup}>
         SQL 보기
